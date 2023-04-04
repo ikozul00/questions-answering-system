@@ -5,7 +5,7 @@ import cv2 as cv
 import sys
 
 custom_oem_psm_config = r'--oem 3 --psm 11'
-filename = 'primjer2.jpeg'
+filename = '2kolokvij.jpg'
 
 def read_image():
     #cv2.IMREAD_UNCHANGED: It specifies to load an image as such including alpha channel, TODO: remove alpha channel
@@ -23,9 +23,6 @@ def get_grayscale(image):
     return cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
 
-#change to rgb ?
-#img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
 #resize
 def resize(image, factor):
     height, width = image.shape[:2]
@@ -35,7 +32,6 @@ def resize(image, factor):
 def add_border(image):
     return cv.copyMakeBorder(image,10,10,10,10,cv.BORDER_REFLECT)
 
-#maybe change to adaptive thresholding?
 def thresholding(image):
     ret,th = cv.threshold(image,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU)
     return th
@@ -73,8 +69,10 @@ def mark_regions(image):
 
     for c in contours:
         area = cv.contourArea(c)
-        x,y,w,h = cv.boundingRect(c)
-        line_items_coordinates.append([(x,y), (width, y+h)])
+        #so it only reads questions not random text on sides ex. number of points
+        if area > 10000:
+            x,y,w,h = cv.boundingRect(c)
+            line_items_coordinates.insert(0,[(x,y), (width, y+h)])
 
     return line_items_coordinates
 
@@ -104,7 +102,6 @@ def deskew_image(image):
     # it positive
     else:
         angle = -angle
-    print(angle)
     # rotate the image to deskew it
     h, w = image.shape[:2]
     center = (w // 2, h // 2)
@@ -114,15 +111,8 @@ def deskew_image(image):
 
 
 
-
-
-
-
 # # params=pytesseract.image_to_data(img, lang="hrv+eng", output_type=Output.DICT)
 # # print(params)
-
-# output=pytesseract.run_and_get_output(img)
-# print(output)
 
 
 img=read_image()
@@ -130,28 +120,24 @@ img=get_grayscale(img)
 
 #find regions
 line_items_coordinates = mark_regions(img)
-# img=resize(img, 2)
-# img=add_border(img)
-# img=remove_noise(img)
-# img=thresholding(img)
-# display_image(img)
+
+whole_text=[]
 
 for c in line_items_coordinates:
     # cropping image img = image[y0:y1, x0:x1]
     cropped = img[c[0][1]:c[1][1], c[0][0]:c[1][0]]    
-    display_image(cropped)
     deskewed=deskew_image(cropped)
     resized=resize(deskewed, 2)
     with_border=add_border(resized)
     without_noise=remove_noise(with_border)
-    threshed=thresholding(without_noise)
-    # display_image(dilated)
+    threshed=adaptive_thresholding(without_noise)
+    # display_image(threshed, "image")
 
     text = pytesseract.image_to_string(threshed, lang="hrv+eng", config=custom_oem_psm_config)
-    print(text)
+    whole_text.append(text)
 
-# with open(filename+'.txt', 'w') as f:
-#     f.writelines(text)
 
-# # cv2.imshow('img2', img)
-# # cv2.waitKey(0)
+
+with open(filename+'.txt', 'w') as f:
+    f.writelines(whole_text)
+
