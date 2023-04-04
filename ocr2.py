@@ -5,17 +5,17 @@ import cv2 as cv
 import sys
 
 custom_oem_psm_config = r'--oem 3 --psm 11'
-filename = '2kolokvij.jpg'
+filename = 'primjer2.jpeg'
 
 def read_image():
-    #cv2.IMREAD_UNCHANGED: It specifies to load an image as such including alpha channel.
-    img = cv.imread(filename, cv.IMREAD_UNCHANGED)
+    #cv2.IMREAD_UNCHANGED: It specifies to load an image as such including alpha channel, TODO: remove alpha channel
+    img = cv.imread(filename)
     if img is None:
         sys.exit("Could not read the image.")
     return img
 
-def display_image(image):
-    cv.imshow('img2', image)
+def display_image(image, name):
+    cv.imshow(name, image)
     cv.waitKey(0)
 
 #turn into gray image
@@ -31,11 +31,6 @@ def resize(image, factor):
     height, width = image.shape[:2]
     return cv.resize(image,(factor*width, factor*height), interpolation = cv.INTER_LINEAR)
 
-#rotation with respect to center - how to detect amount of rotation?
-def rotate(image, degree_x, degree_y):
-    cols, rows= image.shape
-    M = cv.getRotationMatrix2D(((cols-1)/2.0,(rows-1)/2.0),degree_x,degree_y)
-    return cv.warpAffine(image,M,(cols,rows))
 
 def add_border(image):
     return cv.copyMakeBorder(image,10,10,10,10,cv.BORDER_REFLECT)
@@ -84,6 +79,41 @@ def mark_regions(image):
     return line_items_coordinates
 
 
+#https://pyimagesearch.com/2017/02/20/text-skew-correction-opencv-python/
+def deskew_image(image):
+    # flip the foreground
+    # and background to ensure foreground is now "white" and
+    # the background is "black"
+    gray = cv.bitwise_not(image)
+    # threshold the image, setting all foreground pixels to
+    # 255 and all background pixels to 0
+    threshed = thresholding(gray)
+    # grab the (x, y) coordinates of all pixel values that
+    # are greater than zero, then use these coordinates to
+    # compute a rotated bounding box that contains all
+    # coordinates
+    coords = np.column_stack(np.where(threshed > 0))
+    angle = cv.minAreaRect(coords)[-1]
+    # the `cv2.minAreaRect` function returns values in the
+    # range [-90, 0); as the rectangle rotates clockwise the
+    # returned angle trends to 0 -- in this special case we
+    # need to add 90 degrees to the angle
+    if angle < -45:
+        angle = -(90 + angle)
+    # otherwise, just take the inverse of the angle to make
+    # it positive
+    else:
+        angle = -angle
+    print(angle)
+    # rotate the image to deskew it
+    h, w = image.shape[:2]
+    center = (w // 2, h // 2)
+    rotation_matrix = cv.getRotationMatrix2D(center, angle, 1.0)
+    rotated = cv.warpAffine(image, rotation_matrix, (w, h),cv.INTER_CUBIC, cv.BORDER_REPLICATE)
+    return rotated
+
+
+
 
 
 
@@ -95,7 +125,6 @@ def mark_regions(image):
 # print(output)
 
 
-# # img1 = np.array(Image.open(filename))
 img=read_image()
 img=get_grayscale(img)
 
@@ -103,20 +132,20 @@ img=get_grayscale(img)
 line_items_coordinates = mark_regions(img)
 # img=resize(img, 2)
 # img=add_border(img)
-# img=rotate(img,-2,1)
 # img=remove_noise(img)
 # img=thresholding(img)
 # display_image(img)
 
 for c in line_items_coordinates:
     # cropping image img = image[y0:y1, x0:x1]
-    cropped_image = img[c[0][1]:c[1][1], c[0][0]:c[1][0]]    
-    resized=resize(cropped_image, 2)
+    cropped = img[c[0][1]:c[1][1], c[0][0]:c[1][0]]    
+    display_image(cropped)
+    deskewed=deskew_image(cropped)
+    resized=resize(deskewed, 2)
     with_border=add_border(resized)
-    # img=rotate(img,-2,1)
     without_noise=remove_noise(with_border)
     threshed=thresholding(without_noise)
-    display_image(dilated)
+    # display_image(dilated)
 
     text = pytesseract.image_to_string(threshed, lang="hrv+eng", config=custom_oem_psm_config)
     print(text)
