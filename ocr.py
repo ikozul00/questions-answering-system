@@ -1,34 +1,42 @@
-# from PIL import Image
+
 import pytesseract
-import numpy as np
-import cv2 
+from image_functions import read_image, display_image
+import image_transfromations as transformations
+from crop_image import mark_regions
 
-filename = 'primjer2.jpeg'
-img = cv2.imread(filename)
+custom_oem_psm_config = r'--oem 3 --psm 1'
+filename = '2kolokvij.jpg'
 
-h, w, c = img.shape
-boxes = pytesseract.image_to_boxes(img) 
-for b in boxes.splitlines():
-    b = b.split(' ')
-    img = cv2.rectangle(img, (int(b[1]), h - int(b[2])), (int(b[3]), h - int(b[4])), (0, 255, 0), 2)
-
-cv2.imshow('img', img)
-cv2.waitKey(0)
+# # params=pytesseract.image_to_data(img, lang="hrv+eng", output_type=Output.DICT)
+# # print(params)
 
 
-norm_img = np.zeros((img.shape[0], img.shape[1]))
-img = cv2.normalize(img, norm_img, 0, 255, cv2.NORM_MINMAX)
-img = cv2.threshold(img, 100, 255, cv2.THRESH_BINARY)[1]
-img = cv2.GaussianBlur(img, (1, 1), 0)
+img=read_image(filename)
+img=transformations.get_grayscale(img)
+
+#find regions
+line_items_coordinates = mark_regions(img)
+
+whole_text=[]
+
+for c in line_items_coordinates:
+    # cropping image img = image[y0:y1, x0:x1]
+    cropped = img[c[0][1]:c[1][1], c[0][0]:c[1][0]]    
+    deskewed=transformations.deskew_image(cropped)
+    resized=transformations.resize(deskewed, 2)
+    with_border=transformations.add_border(resized)
+    without_noise=transformations.remove_noise(with_border)
+    threshed=transformations.adaptive_thresholding(without_noise)
+    # display_image(threshed, "image")
+
+#it returns a dictionary find out how to get data!!!!
+    data = pytesseract.image_to_data(threshed, lang="hrv+eng", config=custom_oem_psm_config, output_type=pytesseract.Output.DICT)
+    number_of_items= data["text"].length
+    print(number_of_items)
+#     whole_text.append(text)
 
 
 
+# with open('./results/'+filename+'_result1data'+'.txt', 'w') as f:
+#     f.writelines(whole_text)
 
-# img1 = np.array(Image.open(filename))
-text = pytesseract.image_to_string(img, lang="hrv")
-
-with open('output2.txt', 'w') as f:
-    f.writelines(text)
-
-# cv2.imshow('img2', img)
-# cv2.waitKey(0)
