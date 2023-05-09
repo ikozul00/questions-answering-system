@@ -17,6 +17,8 @@ import {
   View,
 } from 'react-native';
 import {Home} from './src/features/home/Home';
+import {ThemeProvider} from 'styled-components/native';
+import {theme} from './src/features/theme/theme';
 
 // import {
 //   Colors,
@@ -58,10 +60,12 @@ import {Home} from './src/features/home/Home';
 
 function App(): JSX.Element {
   return (
-    <SafeAreaView>
-      <StatusBar />
-      <Home />
-    </SafeAreaView>
+    <ThemeProvider theme={theme}>
+      <SafeAreaView style={{flex: 1}}>
+        <StatusBar />
+        <Home />
+      </SafeAreaView>
+    </ThemeProvider>
   );
 }
 
