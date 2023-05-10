@@ -7,21 +7,7 @@
 import 'react-native-gesture-handler';
 import React from 'react';
 // import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {Home} from './src/features/home/Home';
-import {ThemeProvider} from 'styled-components/native';
-import {theme} from './src/features/theme/theme';
-import {ImageDisplay} from './src/features/ImageDisplay/ImageDisplay';
+import {Screens} from './src/features/navigation/Screens';
 
 // import {
 //   Colors,
@@ -61,22 +47,8 @@ import {ImageDisplay} from './src/features/ImageDisplay/ImageDisplay';
 //   );
 // }
 
-const Stack = createStackNavigator();
-
 function App(): JSX.Element {
-  return (
-    <ThemeProvider theme={theme}>
-      <NavigationContainer>
-        <SafeAreaView style={{flex: 1}}>
-          <StatusBar />
-          <Stack.Navigator>
-            <Stack.Screen name="Home" component={Home} />
-            <Stack.Screen name="Image" component={ImageDisplay} />
-          </Stack.Navigator>
-        </SafeAreaView>
-      </NavigationContainer>
-    </ThemeProvider>
-  );
+  return <Screens />;
 }
 
 export default App;

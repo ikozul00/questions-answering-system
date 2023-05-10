@@ -15,9 +15,12 @@ export const theme: DefaultTheme = {
     extralarge: '28px',
   },
   spaces: {
+    space2: '2px',
     space4: '4px',
     space8: '8px',
     space16: '16px',
+    space24: '24px',
     space48: '48px',
   },
+  borderRadius: '5px',
 };

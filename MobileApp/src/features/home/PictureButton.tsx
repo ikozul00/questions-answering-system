@@ -4,6 +4,7 @@ import {PermissionsAndroid} from 'react-native';
 import styled, {useTheme} from 'styled-components/native';
 import * as ImagePicker from 'react-native-image-picker';
 import {useNavigation} from '@react-navigation/native';
+import type {HomeScreenNavigationProp} from '../navigation/types';
 
 type PictureButtonProps = PropsWithChildren<{
   type: string;
@@ -14,7 +15,6 @@ const requestCameraPermission = async () => {
     const status = await PermissionsAndroid.check(
       PermissionsAndroid.PERMISSIONS.CAMERA,
     );
-    console.log(status);
     if (!status) {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -53,7 +53,7 @@ const requestCameraPermission = async () => {
 export const PictureButton = function PictureButton({
   type,
 }: PictureButtonProps): JSX.Element {
-  const navigation = useNavigation();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   interface Action {
     title: string;
@@ -67,7 +67,7 @@ export const PictureButton = function PictureButton({
     options: {
       saveToPhotos: true,
       mediaType: 'photo',
-      includeBase64: true,
+      includeBase64: false,
     },
   };
 
@@ -76,24 +76,23 @@ export const PictureButton = function PictureButton({
     type: 'library',
     options: {
       mediaType: 'photo',
-      includeBase64: true,
+      includeBase64: false,
     },
   };
 
   const onButtonPress = useCallback(async (params: Action) => {
-    console.log(params);
     if (type === 'capture') {
       const isPermitted = await requestCameraPermission();
       if (isPermitted) {
         const result = await ImagePicker.launchCamera(params.options);
-        navigation.navigate('Image');
+        navigation.navigate('Image', {uri: result.assets[0].uri});
         return;
       }
       console.log('Problem with permissions while taking a photo');
       return;
     }
     const result = await ImagePicker.launchImageLibrary(params.options);
-    navigation.navigate('Image');
+    navigation.navigate('Image', {uri: result.assets[0].uri});
   }, []);
 
   return (
@@ -113,7 +112,7 @@ const StyledTouchableOpacity = styled.TouchableOpacity`
   padding-top: ${({theme}) => theme.spaces.space16};
   padding-bottom: ${({theme}) => theme.spaces.space16};
   width: 70%;
-  border-radius: 10px;
+  border-radius: ${({theme}) => theme.borderRadius};
 `;
 
 const StyledTextLabel = styled.Text`

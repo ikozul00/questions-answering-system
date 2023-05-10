@@ -16,10 +16,13 @@ declare module 'styled-components/native' {
       extralarge: string;
     };
     spaces: {
+      space2: string;
       space4: string;
       space8: string;
       space16: string;
+      space24: string;
       space48: string;
     };
+    borderRadius: string;
   }
 }
