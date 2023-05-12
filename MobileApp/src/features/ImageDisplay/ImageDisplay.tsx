@@ -16,18 +16,19 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
       name: fileData.fileName,
       type: fileData.type,
     });
+    data.append('title', name);
     try {
       //Address of localhost on android emulator
-      const response = await fetch('http://10.0.2.2:8000/uploadimage/', {
+      const response = await fetch(`http://10.0.2.2:8000/uploadImage/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         body: data,
       });
-      console.log(response.json());
+      const jsonRes = await response.json();
+      console.log(jsonRes);
     } catch (err) {
-      console.log(err);
       console.warn(err);
     }
   };
@@ -39,9 +40,9 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
       }}>
       <StyledViewContainer>
         <StyledViewInputContainer>
-          <StyledTextLabel>Filename:</StyledTextLabel>
+          <StyledTextLabel>Title:</StyledTextLabel>
           <StyledTextInput
-            placeholder={'filename.jpg/jpeg/png'}
+            placeholder={'Some title'}
             value={name}
             onChangeText={value => setName(value)}
           />

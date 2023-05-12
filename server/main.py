@@ -1,4 +1,5 @@
-from fastapi import FastAPI, File, UploadFile
+from typing import Annotated
+from fastapi import FastAPI, File, UploadFile, Form
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -11,10 +12,9 @@ class Item(BaseModel):
 async def root():
     return {"message": "Hello World"}
 
-
-
-@app.post("/uploadimage/")
-async def create_upload_image(file: bytes = File(...)):
+@app.post("/uploadImage/")
+async def create_upload_image(file: Annotated[bytes, File()], title: Annotated[str, Form()],):
+    print(title)
     with open('image.jpg','wb') as image:
         image.write(file)
         image.close()
