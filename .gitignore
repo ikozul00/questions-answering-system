@@ -3,6 +3,7 @@ server/pyvenc.cfg
 server/__pycache__/
 server/Scripts/
 server/Lib/
+server/Lib//
 server/Include
 
 # TODO: delete later
