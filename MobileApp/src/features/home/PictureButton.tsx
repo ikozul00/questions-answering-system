@@ -81,18 +81,28 @@ export const PictureButton = function PictureButton({
   };
 
   const onButtonPress = useCallback(async (params: Action) => {
+    let result;
     if (type === 'capture') {
       const isPermitted = await requestCameraPermission();
       if (isPermitted) {
-        const result = await ImagePicker.launchCamera(params.options);
-        navigation.navigate('Image', {uri: result.assets[0].uri});
-        return;
+        result = await ImagePicker.launchCamera(params.options);
       }
       console.log('Problem with permissions while taking a photo');
+    } else {
+      result = await ImagePicker.launchImageLibrary(params.options);
+    }
+    if (result?.assets) {
+      const data = result.assets[0];
+      navigation.navigate('Image', {
+        file: {
+          fileName: data.fileName,
+          type: data.type,
+          uri: data.uri,
+        },
+      });
       return;
     }
-    const result = await ImagePicker.launchImageLibrary(params.options);
-    navigation.navigate('Image', {uri: result.assets[0].uri});
+    console.log('Image not taken.');
   }, []);
 
   return (

@@ -1,13 +1,36 @@
 import React, {useState} from 'react';
-import {ScrollView, Text, TextInput} from 'react-native';
-import styled, {useTheme} from 'styled-components/native';
+import styled from 'styled-components/native';
 import type {ImageScreenRouteProp} from '../navigation/types';
 import {useRoute} from '@react-navigation/native';
 
 export const ImageDisplay = function ImageDisplay(): JSX.Element {
   const route = useRoute<ImageScreenRouteProp>();
+  const fileData = route.params.file;
 
   const [name, setName] = useState('');
+
+  const uploadFile = async () => {
+    const data = new FormData();
+    data.append('file', {
+      uri: fileData.uri,
+      name: fileData.fileName,
+      type: fileData.type,
+    });
+    try {
+      //Address of localhost on android emulator
+      const response = await fetch('http://10.0.2.2:8000/uploadimage/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        body: data,
+      });
+      console.log(response.json());
+    } catch (err) {
+      console.log(err);
+      console.warn(err);
+    }
+  };
 
   return (
     <StyledScrollView
@@ -26,10 +49,10 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
         <StyledImage
           resizeMode="stretch"
           source={{
-            uri: route.params.uri,
+            uri: fileData.uri,
           }}
         />
-        <StyledTouchableOpacity>
+        <StyledTouchableOpacity onPress={uploadFile}>
           <StyledTextButtonLabel>Submit</StyledTextButtonLabel>
         </StyledTouchableOpacity>
       </StyledViewContainer>
