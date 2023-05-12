@@ -1,5 +1,5 @@
 __pycache__/
-pyvenc.cfg
+server/pyvenc.cfg
 server/__pycache__/
 server/Scripts/
 server/Lib/
