@@ -1,0 +1,10 @@
+__pycache__/
+pyvenc.cfg
+server/__pycache__/
+server/Scripts/
+server/Lib/
+server/Include
+
+# TODO: delete later
+examples/
+results/
