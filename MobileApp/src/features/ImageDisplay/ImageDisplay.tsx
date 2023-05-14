@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {Text} from 'react-native';
 import styled from 'styled-components/native';
 import type {ImageScreenRouteProp} from '../navigation/types';
 import {useRoute} from '@react-navigation/native';
@@ -6,6 +7,7 @@ import {useRoute} from '@react-navigation/native';
 export const ImageDisplay = function ImageDisplay(): JSX.Element {
   const route = useRoute<ImageScreenRouteProp>();
   const fileData = route.params.file;
+  const [result, setResult] = useState('');
 
   const [name, setName] = useState('');
 
@@ -17,17 +19,23 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
       type: fileData.type,
     });
     data.append('title', name);
+    console.log('evo');
     try {
-      //Address of localhost on android emulator
-      const response = await fetch(`http://10.0.2.2:8000/uploadImage/`, {
+      //Address of localhost on android emulator: 10.0.2.2
+      const response = await fetch(`http://localhost:8000/uploadImage/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
         },
         body: data,
       });
+      if (!response.ok) {
+        console.warn('Problem fetching text.');
+        return;
+      }
       const jsonRes = await response.json();
       console.log(jsonRes);
+      setResult(jsonRes.result);
     } catch (err) {
       console.warn(err);
     }
@@ -48,7 +56,7 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
           />
         </StyledViewInputContainer>
         <StyledImage
-          resizeMode="stretch"
+          resizeMode="contain"
           source={{
             uri: fileData.uri,
           }}
@@ -56,6 +64,7 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
         <StyledTouchableOpacity onPress={uploadFile}>
           <StyledTextButtonLabel>Submit</StyledTextButtonLabel>
         </StyledTouchableOpacity>
+        {result && <Text>{result}</Text>}
       </StyledViewContainer>
     </StyledScrollView>
   );

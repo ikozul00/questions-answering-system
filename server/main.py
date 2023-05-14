@@ -19,10 +19,12 @@ async def create_upload_image(file: Annotated[UploadFile, File()], title: Annota
     content = await file.read()
     image= read_image(content)
     parts = prepare_images(image)
-    text=""
+    text=[]
     for part in parts:
+        print(part)
         result = apply_tesseract(part)
-        print(result)
-        text=text + result["text"][0]
+        for word in result["text"]:
+            text.append(word)
+    text = ''.join(text)
     print(text)
-    return 'got it'
+    return {"result":text}
