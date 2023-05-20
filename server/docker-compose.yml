@@ -1,0 +1,36 @@
+version: "3"
+services:
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - rabbitmq
+      - mongo
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - rabbitmq
+      - mongo
+    volumes:
+      - ./app:/code/app
+      - ./app/celery_tasks:/code/app/celery_tasks
+    command: celery -A app.celery_tasks.tasks worker --loglevel=info
+
+  rabbitmq:
+    image: rabbitmq:3
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  mongo:
+    image: mongodb/mongodb-community-server:latest
+    ports:
+      - 27017:27017
+    volumes:
+      - /data:/data/mongodb/db

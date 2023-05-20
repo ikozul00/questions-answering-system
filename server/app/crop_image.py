@@ -1,5 +1,5 @@
 import cv2 as cv 
-import image_transfromations as transformations
+import app.image_transfromations as transformations
 
 
 def mark_regions(image):

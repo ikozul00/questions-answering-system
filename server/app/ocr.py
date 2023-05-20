@@ -1,8 +1,7 @@
 
 import pytesseract
-from image_functions import read_image, display_image
-import image_transfromations as transformations
-from crop_image import mark_regions
+import app.image_transfromations as transformations
+from app.crop_image import mark_regions
 
 # # params=pytesseract.image_to_data(img, lang="hrv+eng", output_type=Output.DICT)
 # # print(params)
