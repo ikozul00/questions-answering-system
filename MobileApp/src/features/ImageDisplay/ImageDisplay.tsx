@@ -21,6 +21,7 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
     data.append('title', name);
     console.log('evo');
     try {
+      console.log('nesto');
       //Address of localhost on android emulator: 10.0.2.2
       const response = await fetch(`http://localhost:8000/uploadImage/`, {
         method: 'POST',
