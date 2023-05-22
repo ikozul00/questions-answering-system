@@ -1,5 +1,6 @@
 from celery import Celery
 from . import celeryconfig
+from app.mongo_functions import get_database
 
 from app.image_functions import read_image
 from app.ocr import prepare_images, apply_tesseract, get_image_orientation
@@ -20,6 +21,12 @@ def add(x, y):
 
 @celeryApp.task(bind=True)
 def imagetask(self,content, title):
+    id = self.request.id
+
+    db = get_database()
+    collection = db ["results"]
+    collection.insert_one({"_id": id,"title": title, "status": "STARTED"})
+
     content=base64.b64decode(content.encode('utf-8'))
     image= read_image(content)
     orientation = get_image_orientation(image)
@@ -29,8 +36,7 @@ def imagetask(self,content, title):
         result = apply_tesseract(part)
         text.append(result)
     text = ''.join(text)
+
     cleanresult = clean_text(text)
     answers = get_answers(cleanresult)
-    print(answers)
-    print(self.request.id)
-    return {"id": "id"}
+    return answers

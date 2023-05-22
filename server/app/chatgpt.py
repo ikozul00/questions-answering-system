@@ -2,7 +2,6 @@ import openai
 from dotenv import dotenv_values
 
 config = dotenv_values()
-print(config.values())
 
 openai.api_key = config["OPENAI_API_KEY"]
 
