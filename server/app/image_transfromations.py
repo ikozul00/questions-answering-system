@@ -1,6 +1,7 @@
 import cv2 as cv 
 import numpy as np
 
+
 #turn into gray image
 def get_grayscale(image):
     return cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -38,7 +39,7 @@ def dilate(image):
 
 
 #https://pyimagesearch.com/2017/02/20/text-skew-correction-opencv-python/
-def deskew_image(image):
+def deskew_image(image, rotation):
     # flip the foreground
     # and background to ensure foreground is now "white" and
     # the background is "black"
@@ -46,6 +47,7 @@ def deskew_image(image):
     # threshold the image, setting all foreground pixels to
     # 255 and all background pixels to 0
     threshed = thresholding(gray)
+    
     # grab the (x, y) coordinates of all pixel values that
     # are greater than zero, then use these coordinates to
     # compute a rotated bounding box that contains all
@@ -56,12 +58,19 @@ def deskew_image(image):
     # range [-90, 0); as the rectangle rotates clockwise the
     # returned angle trends to 0 -- in this special case we
     # need to add 90 degrees to the angle
+    if rotation == 0 and angle>88 and angle<92:
+        angle=angle-90
+    
+    if rotation == 90 and angle>-2 and angle<2:
+        angle=angle+90
+
     if angle < -45:
         angle = -(90 + angle)
     # otherwise, just take the inverse of the angle to make
     # it positive
     else:
         angle = -angle
+
     # rotate the image to deskew it
     h, w = image.shape[:2]
     center = (w // 2, h // 2)

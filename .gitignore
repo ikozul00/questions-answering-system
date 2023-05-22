@@ -5,6 +5,9 @@ server/Scripts/
 server/Lib/
 server/pyvenv.cfg
 server/Include
+server/app/.env
+server/.env
+
 
 # TODO: delete later
 examples/

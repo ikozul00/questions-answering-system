@@ -35,7 +35,10 @@ services:
     ports:
       - 27017:27017
     environment:
-      - MONGODB_INITDB_ROOT_USERNAME=ivana
-      - MONGODB_INITDB_ROOT_PASSWORD=***
+      - MONGODB_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
     volumes:
-      - /data:/data/mongodb/db
+      - /mongod_data:/data/mongodb/db
+
+volumes:
+  mongodb_data:
