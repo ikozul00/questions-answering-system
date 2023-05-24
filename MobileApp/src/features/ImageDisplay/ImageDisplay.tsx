@@ -1,13 +1,16 @@
 import React, {useState} from 'react';
 import {Text} from 'react-native';
 import styled from 'styled-components/native';
-import type {ImageScreenRouteProp} from '../navigation/types';
-import {useRoute} from '@react-navigation/native';
+import {
+  ImageScreenNavigationProp,
+  ImageScreenRouteProp,
+} from '../navigation/types';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 export const ImageDisplay = function ImageDisplay(): JSX.Element {
   const route = useRoute<ImageScreenRouteProp>();
+  const navigation = useNavigation<ImageScreenNavigationProp>();
   const fileData = route.params.file;
-  const [result, setResult] = useState('');
 
   const [name, setName] = useState('');
 
@@ -19,9 +22,7 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
       type: fileData.type,
     });
     data.append('title', name);
-    console.log('evo');
     try {
-      console.log('nesto');
       //Address of localhost on android emulator: 10.0.2.2
       const response = await fetch(`http://localhost:8000/uploadImage/`, {
         method: 'POST',
@@ -34,12 +35,10 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
         console.warn('Problem fetching text.');
         return;
       }
-      const jsonRes = await response.json();
-      console.log(jsonRes);
-      setResult(jsonRes.result);
     } catch (err) {
       console.warn(err);
     }
+    navigation.navigate('Home');
   };
 
   return (
@@ -65,7 +64,6 @@ export const ImageDisplay = function ImageDisplay(): JSX.Element {
         <StyledTouchableOpacity onPress={uploadFile}>
           <StyledTextButtonLabel>Submit</StyledTextButtonLabel>
         </StyledTouchableOpacity>
-        {result && <Text>{result}</Text>}
       </StyledViewContainer>
     </StyledScrollView>
   );

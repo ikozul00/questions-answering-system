@@ -10,11 +10,25 @@ export type StackParamList = {
       uri: string | undefined;
     };
   };
+  Results: undefined;
+  ResultDisplay: {id: string};
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<
   StackParamList,
+  'Home'
+>;
+
+export type ImageScreenNavigationProp = NativeStackNavigationProp<
+  StackParamList,
   'Image'
 >;
 
+export type ResultsScreenNavigationProp = NativeStackNavigationProp<
+  StackParamList,
+  'Results'
+>;
+
 export type ImageScreenRouteProp = RouteProp<StackParamList, 'Image'>;
+
+export type ResultScreenRouteProp = RouteProp<StackParamList, 'Image'>;

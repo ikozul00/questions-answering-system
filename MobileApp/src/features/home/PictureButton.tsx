@@ -1,7 +1,7 @@
 import React, {useCallback} from 'react';
 import type {PropsWithChildren} from 'react';
 import {PermissionsAndroid} from 'react-native';
-import styled, {useTheme} from 'styled-components/native';
+import styled from 'styled-components/native';
 import * as ImagePicker from 'react-native-image-picker';
 import {useNavigation} from '@react-navigation/native';
 import type {HomeScreenNavigationProp} from '../navigation/types';
