@@ -7,8 +7,8 @@ from celery import chain
 from pymongo import MongoClient
 from dotenv import dotenv_values
 
-from app.celery_tasks.tasks import prepare_images_task, apply_tesseract_task, get_answers_task
-from app.mongo_functions import get_database, update_task, get_done_tasks, add_new_task
+from app.celery_tasks.tasks import prepare_images_task, apply_tesseract_task, get_answers_task, save_task_result
+from app.mongo_functions import get_database, get_tasks, add_new_task, get_result_data
 
 
 config = dotenv_values()
@@ -42,28 +42,30 @@ async def root():
 @app.post("/uploadImage/")
 async def create_upload_image(request:Request, file: Annotated[UploadFile, File()], title: Annotated[str, Form()],):
     content = await file.read()
-    task = chain( prepare_images_task.s() | apply_tesseract_task.s() | get_answers_task.s())
+    task = chain( prepare_images_task.s() | apply_tesseract_task.s() | get_answers_task.s() | save_task_result.s())
     id=task.delay(base64.b64encode(content).decode('utf-8'))
-    db_id = add_new_task(request.app.database["results"], str(id), title, content)
+    db_id = add_new_task(request.app.database, str(id), title, content)
     return {"id": str(id)}
 
-@app.get("/doneResults/")
-async def get_done_tasks(request:Request):
-    done = get_done_tasks(request.app.database["results"])
-    return done
+@app.get("/getResults")
+async def get_results(request: Request):
+    tasks = get_tasks(request.app.database["results"])
+    tasks = list(tasks)
+    done=[]
+    inprogress=[]
+
+    for task in tasks:
+        if task["status"] == "STARTED":
+            inprogress.append({"id":task["_id"], "title": task["title"]})
+        elif task["status"] == "SUCCESS":
+            done.append({"id":task["_id"], "title": task["title"]})
+
+    return {"done": done, "inprogress": inprogress}
 
 
-#how to solve this with update many?
-@app.post("/updateStatus/")
-async def update_status_of_task(request:Request,ids: StatusArgs):
-    inprogess = []
-    done = []
-    for id in ids:
-        task=AsyncResult(id)
-        status="STARTED"
-        if task.ready():
-            result = task.get()
-            print(result)
-            update_task(request.app.database["results"], id, result)
-            status="SUCCESS"
-    return {"status": status}
+
+@app.get("/getTaskData")
+async def get_task_data(request: Request, id:str):
+    result, image = get_result_data(request.app.database, id)
+    encoded_image = base64.b64encode(image).decode('utf-8')
+    return {"id": result["_id"], "title": result["title"], "answers":result["result"], "image":encoded_image}
