@@ -1,14 +1,15 @@
-from typing import Annotated
+from typing import Annotated, List
 from fastapi import FastAPI, File, UploadFile, Form, Request
 from pydantic import BaseModel
-from typing import List
-from celery.result import AsyncResult
-from app.celery_tasks.tasks import add, imagetask
 import base64
-from app.mongo_functions import get_database
+from celery.result import AsyncResult
+from celery import chain
 from pymongo import MongoClient
-from app.mongo_functions import update_task, get_done_tasks
 from dotenv import dotenv_values
+
+from app.celery_tasks.tasks import prepare_images_task, apply_tesseract_task, get_answers_task
+from app.mongo_functions import get_database, update_task, get_done_tasks, add_new_task
+
 
 config = dotenv_values()
 
@@ -39,9 +40,11 @@ async def root():
     return {"message": "Hello World"}
 
 @app.post("/uploadImage/")
-async def create_upload_image(file: Annotated[UploadFile, File()], title: Annotated[str, Form()],):
+async def create_upload_image(request:Request, file: Annotated[UploadFile, File()], title: Annotated[str, Form()],):
     content = await file.read()
-    id=imagetask.delay(base64.b64encode(content).decode('utf-8'), title)
+    task = chain( prepare_images_task.s() | apply_tesseract_task.s() | get_answers_task.s())
+    id=task.delay(base64.b64encode(content).decode('utf-8'))
+    db_id = add_new_task(request.app.database["results"], str(id), title, content)
     return {"id": str(id)}
 
 @app.get("/doneResults/")

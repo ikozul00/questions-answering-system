@@ -8,6 +8,10 @@ def get_database():
    client = MongoClient(CONNECTION_STRING)
    return client['ocrdb']
 
+def add_new_task(collection, id, title, image):
+    return collection.insert_one({"_id": id,"title": title,"image":image, "status": "STARTED"})
+
+
 def update_task(collection, id, result):
     print(id)
     filter = {"_id": id}
