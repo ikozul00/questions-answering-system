@@ -11,4 +11,4 @@ server/.env
 
 # TODO: delete later
 examples/
-results/
+result_images/

@@ -31,4 +31,4 @@ export type ResultsScreenNavigationProp = NativeStackNavigationProp<
 
 export type ImageScreenRouteProp = RouteProp<StackParamList, 'Image'>;
 
-export type ResultScreenRouteProp = RouteProp<StackParamList, 'Image'>;
+export type ResultScreenRouteProp = RouteProp<StackParamList, 'ResultDisplay'>;

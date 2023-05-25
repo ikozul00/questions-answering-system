@@ -27,6 +27,8 @@ def get_tasks(collection):
 
 def get_result_data(db, id):
     data = db["results"].find_one({"_id":id})
+    if data == None:
+        return None, None
     fs= GridFS(db)
     image = fs.get(data["image"]).read()
     return data, image

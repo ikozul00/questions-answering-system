@@ -67,5 +67,7 @@ async def get_results(request: Request):
 @app.get("/getTaskData")
 async def get_task_data(request: Request, id:str):
     result, image = get_result_data(request.app.database, id)
+    if result == None:
+        return {"id":"Id doesn't exist"}
     encoded_image = base64.b64encode(image).decode('utf-8')
     return {"id": result["_id"], "title": result["title"], "answers":result["result"], "image":encoded_image}
