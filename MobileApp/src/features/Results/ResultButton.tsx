@@ -29,5 +29,6 @@ const StyledTouchableOpacity = styled.TouchableOpacity`
 
 const StyledTextLabel = styled.Text`
   color: ${({theme}) => theme.colors.secondary};
+  text-decoration: underline;
   font-size: ${({theme}) => theme.fontSizes.medium};
 `;

@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {View} from 'react-native';
 import styled from 'styled-components/native';
-// import Icon from 'react-native-vector-icons/FontAwesome';
+// import Icon from 'react-native-vector-icons/FontAwesome5';
 import {ResultButton} from './ResultButton';
 
 interface Result {
@@ -44,11 +44,9 @@ export const Results = function (): JSX.Element {
             <StyledViewProgress>
               <StyledTextTitle>In progress</StyledTextTitle>
               {inProgress?.map(result => (
-                <ResultButton
-                  id={result.id}
-                  title={result.title}
-                  key={result.id}
-                />
+                <StyledTextLabel key={result.id}>
+                  {result.title}
+                </StyledTextLabel>
               ))}
             </StyledViewProgress>
           )}
@@ -57,10 +55,11 @@ export const Results = function (): JSX.Element {
             <ResultButton id={result.id} title={result.title} key={result.id} />
           ))}
         </View>
-        <TouchableOpacity onPress={getResults}>
-          {/* <Icon name="sync" size={30} color="#FFFFFF" /> */}
-          <Text>Refresh</Text>
-        </TouchableOpacity>
+        <StyledTouchableOpacityRefresh onPress={getResults}>
+          {/* TODO: find out how to add icon */}
+          {/* <Icon name="sync" size={30} color="#900" /> */}
+          <StyledTextRefresh>Refresh</StyledTextRefresh>
+        </StyledTouchableOpacityRefresh>
       </StyledViewContainer>
     </StyledScrollView>
   );
@@ -84,4 +83,19 @@ const StyledViewProgress = styled.View`
 const StyledTextTitle = styled.Text`
   color: ${({theme}) => theme.colors.primary};
   font-size: ${({theme}) => theme.fontSizes.extralarge};
+`;
+
+const StyledTextLabel = styled.Text`
+  padding-top: ${({theme}) => theme.spaces.space16};
+  color: ${({theme}) => theme.colors.secondary};
+  font-size: ${({theme}) => theme.fontSizes.medium};
+`;
+
+const StyledTouchableOpacityRefresh = styled.Text`
+  margin-right: ${({theme}) => theme.spaces.space16};
+`;
+
+const StyledTextRefresh = styled.Text`
+  color: ${({theme}) => theme.colors.secondary};
+  font-size: ${({theme}) => theme.fontSizes.large};
 `;
