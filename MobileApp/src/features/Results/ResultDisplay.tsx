@@ -91,8 +91,9 @@ const StyledViewContainer = styled.View`
 `;
 
 const StyledTextTitle = styled.Text`
-  color: ${({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.secondary};
   font-size: ${({theme}) => theme.fontSizes.extralarge};
+  font-weight: 800;
   text-align: center;
   margin-bottom: ${({theme}) => theme.spaces.space16};
 `;

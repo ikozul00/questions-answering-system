@@ -38,6 +38,11 @@ export const Results = function (): JSX.Element {
       contentContainerStyle={{
         flexGrow: 1,
       }}>
+      <StyledTouchableOpacityRefresh onPress={getResults}>
+        {/* TODO: find out how to add icon */}
+        {/* <Icon name="sync" size={30} color="#900" /> */}
+        <StyledTextRefresh>Refresh</StyledTextRefresh>
+      </StyledTouchableOpacityRefresh>
       <StyledViewContainer>
         <View>
           {inProgress?.length !== 0 && (
@@ -55,11 +60,6 @@ export const Results = function (): JSX.Element {
             <ResultButton id={result.id} title={result.title} key={result.id} />
           ))}
         </View>
-        <StyledTouchableOpacityRefresh onPress={getResults}>
-          {/* TODO: find out how to add icon */}
-          {/* <Icon name="sync" size={30} color="#900" /> */}
-          <StyledTextRefresh>Refresh</StyledTextRefresh>
-        </StyledTouchableOpacityRefresh>
       </StyledViewContainer>
     </StyledScrollView>
   );
@@ -81,8 +81,9 @@ const StyledViewProgress = styled.View`
 `;
 
 const StyledTextTitle = styled.Text`
-  color: ${({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.secondary};
   font-size: ${({theme}) => theme.fontSizes.extralarge};
+  font-weight: 800;
 `;
 
 const StyledTextLabel = styled.Text`
@@ -92,10 +93,18 @@ const StyledTextLabel = styled.Text`
 `;
 
 const StyledTouchableOpacityRefresh = styled.Text`
+  background-color: ${({theme}) => theme.colors.secondary};
+  border-radius: ${({theme}) => theme.borderRadius};
+  padding: ${({theme}) => theme.spaces.space16}
+    ${({theme}) => theme.spaces.space8};
+  text-align: center;
+  align-self: flex-end;
   margin-right: ${({theme}) => theme.spaces.space16};
+  margin-top: ${({theme}) => theme.spaces.space16};
 `;
 
 const StyledTextRefresh = styled.Text`
-  color: ${({theme}) => theme.colors.secondary};
+  color: ${({theme}) => theme.colors.tertiary};
   font-size: ${({theme}) => theme.fontSizes.large};
+  text-align: center;
 `;

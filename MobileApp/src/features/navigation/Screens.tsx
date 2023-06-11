@@ -19,17 +19,34 @@ export const Screens = function (): JSX.Element {
       <NavigationContainer>
         <SafeAreaView style={{flex: 1}}>
           <StatusBar />
-          <Stack.Navigator>
+          <Stack.Navigator
+            screenOptions={{
+              headerStyle: {
+                backgroundColor: theme.colors.secondary,
+              },
+              headerTitleAlign: 'center',
+              headerTintColor: theme.colors.tertiary,
+              headerTitleStyle: {
+                fontWeight: 'bold',
+                paddingVertical: 8,
+              },
+            }}>
             <Stack.Screen name="Home" component={Home} />
             <Stack.Screen
               name="Image"
               component={ImageDisplay}
               initialParams={{uri: ''}}
+              options={{title: 'Image'}}
             />
-            <Stack.Screen name="Results" component={Results} />
+            <Stack.Screen
+              name="Results"
+              component={Results}
+              options={{title: 'Results'}}
+            />
             <Stack.Screen
               name="ResultDisplay"
               component={ResultDisplay}
+              options={{title: 'Result'}}
               initialParams={{id: ''}}
             />
           </Stack.Navigator>
